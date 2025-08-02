@@ -39,38 +39,41 @@ for pack in packs_df['packname'].to_list():
     with cols[1]:
         st.markdown("<br><br><br><br><br>", unsafe_allow_html=True)
         if st.button('Buy ' + pack + ' pack card'):
-            random_number = random.randint(1, 1000)
-            if random_number >= (pack_row['legendary'] + pack_row['epic'] +\
-                                 pack_row['rare'] + pack_row['uncommon'] + pack_row['common']) * 10:
-                card_rank = 'chroma'
-            elif  random_number >=  (pack_row['epic'] +\
-                                 pack_row['rare'] + pack_row['uncommon'] + pack_row['common']) * 10:
-                card_rank = 'legendary'
-            elif  random_number >= (pack_row['rare'] + pack_row['uncommon'] + pack_row['common']) * 10:
-                card_rank = 'epic'
-            elif  random_number >= (pack_row['uncommon'] + pack_row['common']) * 10:
-                card_rank = 'rare'
-            elif  random_number >= pack_row['common'] * 10:
-                card_rank = 'uncommon'
+            if tokens < pack_row['token']:
+                st.error('Your tokens are not enough to buy this pack!')
             else:
-                card_rank = 'common'
-            cards_rank_df = cards_df[(cards_df['rank'] == card_rank) & (cards_df['pack'] == pack)]
-            random_number = random.randint(0, cards_rank_df.shape[0] - 1)
-            card_got = cards_rank_df['cardname'].iloc[random_number]
+                random_number = random.randint(1, 1000)
+                if random_number >= (pack_row['legendary'] + pack_row['epic'] +\
+                                    pack_row['rare'] + pack_row['uncommon'] + pack_row['common']) * 10:
+                    card_rank = 'chroma'
+                elif  random_number >=  (pack_row['epic'] +\
+                                    pack_row['rare'] + pack_row['uncommon'] + pack_row['common']) * 10:
+                    card_rank = 'legendary'
+                elif  random_number >= (pack_row['rare'] + pack_row['uncommon'] + pack_row['common']) * 10:
+                    card_rank = 'epic'
+                elif  random_number >= (pack_row['uncommon'] + pack_row['common']) * 10:
+                    card_rank = 'rare'
+                elif  random_number >= pack_row['common'] * 10:
+                    card_rank = 'uncommon'
+                else:
+                    card_rank = 'common'
+                cards_rank_df = cards_df[(cards_df['rank'] == card_rank) & (cards_df['pack'] == pack)]
+                random_number = random.randint(0, cards_rank_df.shape[0] - 1)
+                card_got = cards_rank_df['cardname'].iloc[random_number]
 
-            holdings_df = pd.concat([holdings_df, pd.DataFrame(data={'username': [username], 'cardname':[card_got]})])
-            holdings_df.to_csv('csv_files/user_holdings.csv', index=False)
-            idx = users_df.index[users_df['username'] == username].tolist()[0]
-            users_df.at[idx, 'tokens'] -= pack_row['token']
-            users_df.to_csv('csv_files/users.csv', index=False)
+                holdings_df = pd.concat([holdings_df, pd.DataFrame(data={'username': [username], 'cardname':[card_got]})])
+                holdings_df.to_csv('csv_files/user_holdings.csv', index=False)
+                idx = users_df.index[users_df['username'] == username].tolist()[0]
+                users_df.at[idx, 'tokens'] -= pack_row['token']
+                users_df.to_csv('csv_files/users.csv', index=False)
 
-            st.write('Congratulation!')
-            st.write('You got ' + card_got)
-            st.write('Your tokens have been deducted by ' + str(pack_row['token']))
+                st.write('Congratulation!')
+                st.write('You got ' + card_got)
+                st.write('Your tokens have been deducted by ' + str(pack_row['token']))
 
-            card_got_cols = st.columns(2)
-            with card_got_cols[0]:
-                st.image('card_images/' + card_got + '.jpg', use_container_width=True)
+                card_got_cols = st.columns(2)
+                with card_got_cols[0]:
+                    st.image('card_images/' + card_got + '.jpg', use_container_width=True)
                 
         
 with st.sidebar:
